@@ -4,7 +4,7 @@ import { Statement } from "../../entities/Statement";
 import { OperationType } from "../../enums/OperationType";
 import { IStatementsRepository } from "../../repositories/IStatementsRepository";
 import { ITransferOperationDTO } from "./ITransferOperationDTO";
-import { CreateStatementError } from "./TransferOperationError";
+import { TransferOperationError } from "./TransferOperationError";
 
 
 @injectable()
@@ -20,19 +20,19 @@ class TransferOperationUseCase {
     const senderUser = await this.usersRepository.findById(user_id);
 
     if(!senderUser) {
-      throw new CreateStatementError.UserNotFound();
+      throw new TransferOperationError.SenderUserNotFound();
     }
 
     const receiverUser = await this.usersRepository.findById(receiver_id as string);
 
     if(!receiverUser) {
-      throw new CreateStatementError.UserNotFound();
+      throw new TransferOperationError.ReceiverUserNotFound();
     }
 
     const { balance } = await this.statementsRepository.getUserBalance({ user_id })
 
     if(amount > balance) {
-      throw new CreateStatementError.InsufficientFunds();
+      throw new TransferOperationError.InsufficientFunds();
     }
 
     await this.statementsRepository.create({
